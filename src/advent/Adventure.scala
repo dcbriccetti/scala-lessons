@@ -3,14 +3,24 @@ package advent
 object Adventure {
 
   class InventoryItem(val name: String)
-  case class Place(title: String, prep: String = "at", opAction: Option[() => Unit] = None, goal: Boolean = false)
-  case class GameState(var place: Place, var money: Int = 0, var health: Int = 100, var inventory: Seq[InventoryItem] = Nil)
+
+  case class Place(
+    title:    String,
+    prep:     String = "at",
+    opAction: Option[() => Unit] = None,
+    goal:     Boolean = false)
+
+  case class GameState(
+    var place:      Place,
+    var money:      Int = 0,
+    var health:     Int = 100,
+    var inventory:  Seq[InventoryItem] = Nil)
 
   def main(args: Array[String]) {
 
     object BusPass extends InventoryItem("a bus pass")
     case class Money(dollars: Int) extends InventoryItem("$" + dollars)
-    object CodebreakingBook extends InventoryItem("a book on codebreaking")
+    object CodeBreakingBook extends InventoryItem("a book on code breaking")
 
     val livingRoom  = Place("your living room", prep = "in")
     val gs = GameState(livingRoom)
@@ -34,14 +44,14 @@ object Adventure {
         closet      -> Seq(livingRoom),
         bus         -> Seq(kiosk, library, road),
         library     -> Seq(bus),
-        kiosk       -> Seq(bus, Trans(ladder, mustHave = Seq(CodebreakingBook))),
+        kiosk       -> Seq(bus, Trans(ladder, mustHave = Seq(CodeBreakingBook))),
         ladder      -> Seq(treasureRoom, kiosk)
       )
     }
 
     var availInventoryByPlace: Map[Place, Seq[InventoryItem]] = Map(
       closet  -> Seq(new Money(100), BusPass),
-      library -> Seq(CodebreakingBook)
+      library -> Seq(CodeBreakingBook)
     )
 
     var keepRunning = true
