@@ -35,16 +35,16 @@ object Adventure {
     val ladder      = Place("a ladder hidden inside the kiosk", prep = "on")
     val treasureRoom= Place("a room full of treasure", prep = "in", goal = true)
 
-    case class Trans(place: Place, mustHave: Seq[InventoryItem] = Nil)
+    case class Transition(place: Place, mustHave: Seq[InventoryItem] = Nil)
     val transitionsByPlace = {
-      implicit def placeToTr(place: Place) = Trans(place)
-      Map[Place, Seq[Trans]](
+      implicit def placeToTransition(place: Place) = Transition(place)
+      Map[Place, Seq[Transition]](
         livingRoom  -> Seq(road, closet),
-        road        -> Seq(livingRoom, Trans(bus, mustHave = Seq(BusPass))),
+        road        -> Seq(livingRoom, Transition(bus, mustHave = Seq(BusPass))),
         closet      -> Seq(livingRoom),
         bus         -> Seq(kiosk, library, road),
         library     -> Seq(bus),
-        kiosk       -> Seq(bus, Trans(ladder, mustHave = Seq(CodeBreakingBook))),
+        kiosk       -> Seq(bus, Transition(ladder, mustHave = Seq(CodeBreakingBook))),
         ladder      -> Seq(treasureRoom, kiosk)
       )
     }
