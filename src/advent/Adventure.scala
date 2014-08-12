@@ -1,5 +1,7 @@
 package advent
 
+import io.StdIn.readLine
+
 object Adventure {
 
   class InventoryItem(val name: String)
@@ -75,7 +77,7 @@ object Adventure {
           val fromHere = transitions.filter(_.mustHave.forall(c => gs.inventory.contains(c))).map(_.place)
           println(s"You can go to: ${fromHere.map(_.title).mkString(", ")}.")
           println("Where would you like to go (type part of the name)? ")
-          val response = io.ReadStdin.readLine()
+          val response = readLine()
           val newPlaces = fromHere.filter(_.title.toLowerCase.contains(response.toLowerCase))
           newPlaces match {
             case newPlace :: Nil =>
