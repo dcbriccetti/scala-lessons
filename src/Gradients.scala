@@ -27,11 +27,7 @@ class GradientsDisplay extends Component {
     super.paintComponent(g2d)
     var y = Margin
 
-    val idxCombos = for {
-        r <- gradFuncs
-        g <- gradFuncs
-        b <- gradFuncs
-    } {
+    for (r <- gradFuncs; g <- gradFuncs; b <- gradFuncs) {
         0 to 255 foreach(gradation => {
           val x = Margin + GradationWidth * gradation
           g2d.setColor(new Color(r(gradation), g(gradation), b(gradation)))
