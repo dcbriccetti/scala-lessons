@@ -5,8 +5,8 @@ def simulate() = {
     val counts = new Array[Int](13)
     def roll = random(6) + 1
     repeat(1000) {
-        val t = roll + roll
-        counts(t) += 1
+        val outcome = roll + roll
+        counts(outcome) += 1
     }
     2 to 12 foreach(n => println(counts(n)))
     counts
