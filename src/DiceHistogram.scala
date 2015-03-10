@@ -16,21 +16,25 @@ class DiceHistogram extends PApplet {
   def fmt(num: Int) = nf.format(num)
   
   override def setup() {
-    size(barWidth * numBars + spacing * (numBars + 1), 800)
+    size(barWidth * numBars + spacing * (numBars + 1), 300)
     textAlign(CENTER, CENTER)
     smooth()
+    noStroke()
     frameRate(60 * 10)
+    drawStatic()
   }
 
   override def draw() = {
-    background(255)
 
     def roll = rg.nextInt(6) + 1
     val outcome = roll + roll
     counts(outcome) += 1
     rolls += 1
 
+    fill(255)
+    rect(0, 0, width, 30)
     textFont(font1)
+    fill(0)
     text(s"Rolls: ${fmt(rolls)}", width / 2, 10)
 
     var reset = false
@@ -46,20 +50,33 @@ class DiceHistogram extends PApplet {
       }
       fill(0, 0, 128)
       rect(x, y - barHeight, 20, barHeight)
+      fill(255)
+      rect(x, y - barHeight - 10, 20, 10)
       fill(0)
-      textFont(font1)
-      text(barNum.toString, x + barWidth / 2, y + 10)
       textFont(font2)
       text(fmt(countThisBar), x + barWidth / 2, y - barHeight - 5)
     })
     
     if (reset) {
+      println(frameRate)
       rolls = 0
       for (i <- 0 until counts.length) {
         counts(i) = 0
       }
-      println(frameRate)
+      drawStatic()
     }
+  }
+  
+  private def drawStatic() {
+    background(255)
+    0 to 10 foreach(i => {
+      val barNum = i + 2
+      val x = spacing + i * (barWidth + spacing)
+      val y = height - 20
+      fill(0)
+      textFont(font1)
+      text(barNum.toString, x + barWidth / 2, y + 10)
+    })
   }
 }
 
