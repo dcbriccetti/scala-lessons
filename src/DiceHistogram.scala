@@ -21,9 +21,9 @@ class DiceHistogram extends PApplet {
   override def setup() {
     size(barWidth * numBars + spacing * (numBars + 1), 600)
     textAlign(CENTER, CENTER)
-    //smooth()
+    smooth()
     noStroke()
-    //frameRate(2000)
+    frameRate(2000)
     drawStatic()
   }
 
@@ -72,7 +72,6 @@ class DiceHistogram extends PApplet {
   }
 
   private def reset(): Unit = {
-    println(frameRate)
     rolls = 0
     for (i <- 0 until counts.length) {
       counts(i) = 0
