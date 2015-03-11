@@ -70,6 +70,15 @@ class DiceHistogram extends PApplet {
       reset()
     }
   }
+  
+  private var pausing = false
+  
+  override def keyPressed() {
+    if (key == ' ') {
+      pausing = ! pausing
+      if (pausing) noLoop() else loop()
+    }
+  }
 
   private def reset(): Unit = {
     rolls = 0
