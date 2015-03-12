@@ -52,26 +52,32 @@ class DiceHistogram extends PApplet {
     val countThisBar = counts(i)
     val barHeight = countThisBar
     val barPieceY = y - barHeight
+    val combinationsForThisSum = combinationsBySum(sum)
+    val probabilityOfThisRoll = combinationsForThisSum.size / math.pow(numSides, numDice)
+    val expectedCountsOfThisRoll = (probabilityOfThisRoll * numRolls).toInt
 
-    // Draw a line in a light color
-    stroke(220, 220, 255)
+    // Draw a bar background line whose color shows whether this bar is behind, even, or ahead of the expectation
+    val ahead = countThisBar - expectedCountsOfThisRoll
+    if (math.abs(ahead) < 3)
+      stroke(255, 255, 255)
+    else if (ahead > 0)
+      stroke(200, 255, 200)
+    else
+      stroke(255, 200, 200)
     line(x, barPieceY, x + barWidth, barPieceY)
     
     // Draw, in a darker color, the segment of the line corresponding to the combination of dice values
-    val combinationsForThisSum = combinationsBySum(sum)
     val segmentWidth = barWidth / combinationsForThisSum.size
     val indexOfThisRollForThisSum = combinationsForThisSum.indexWhere(_ == rolls)
     val lineStartX = x + segmentWidth * indexOfThisRollForThisSum
     stroke(0, 0, 128)
     line(lineStartX, barPieceY, lineStartX + segmentWidth, barPieceY)
     noStroke()
-    
+
     // Draw a vertical thin bar, showing the expected counts for this sum, given the number of rolls so far
-    val probabilityOfThisRoll = combinationsForThisSum.size / math.pow(numSides, numDice)
-    val expectedCountsOfThisRoll = probabilityOfThisRoll * numRolls
     stroke(0, 0, 0)
-    line(x - 1, y, x - 1, y - expectedCountsOfThisRoll.toInt)
-    line(x + barWidth + 1, y, x + barWidth + 1, y - expectedCountsOfThisRoll.toInt)
+    line(x - 1, y, x - 1, y - expectedCountsOfThisRoll)
+    line(x + barWidth + 1, y, x + barWidth + 1, y - expectedCountsOfThisRoll)
     noStroke()
 
     // Clear any previously-drawn count atop the bar
