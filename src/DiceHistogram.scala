@@ -4,19 +4,29 @@ import processing.core.{PConstants, PApplet}
 import PConstants.CENTER
 
 class DiceHistogram extends PApplet {
-  val counts = new Array[Int](13)
   val barWidth = 60 // Best if a multiple of 1–6, the range of numbers of ways to roll 2–12 (e.g., 6 ways to roll 7)
-  val spacing = 5
-  val numBars = 11
+  val spacing = 7
+  val numDice = 3
+  val numSides = 6
+  val minSum = numDice
+  val maxSum = numDice * numSides
+  val numBars = maxSum - minSum + 1
+  val counts = new Array[Int](numBars)
   val rg = new Random()
-  var rolls = 0
+  var numRolls = 0
   var displayedFrameRate = 0
   val font1 = createFont("Helvetica", 14)
   val font2 = createFont("Helvetica", 10)
   val nf = NumberFormat.getInstance
   nf.setMaximumFractionDigits(0)
   def fmt[A](num: A) = nf.format(num)
-  val outcomes = (for(a <- 1 to 6; b <- 1 to 6) yield a -> b).groupBy(t => t._1 + t._2)
+
+  val combinations: Seq[Seq[Int]] = numDice match {
+    case 1 => for (a <- 1 to numSides) yield Seq(a)
+    case 2 => for (a <- 1 to numSides; b <- 1 to numSides) yield Seq(a, b)
+    case 3 => for (a <- 1 to numSides; b <- 1 to numSides; c <- 1 to numSides) yield Seq(a, b, c)
+  }
+  val combinationsBySum = combinations.groupBy(_.sum)
   
   override def setup() {
     size(barWidth * numBars + spacing * (numBars + 1), 600)
@@ -28,18 +38,18 @@ class DiceHistogram extends PApplet {
   }
 
   override def draw() = {
-    def roll = rg.nextInt(6) + 1
-    val roll1 = roll
-    val roll2 = roll
-    val sum = roll1 + roll2
+    def roll = rg.nextInt(numSides) + 1
+    val rolls = 1 to numDice map(n => roll)
+    val sum = rolls.sum
 
-    counts(sum) += 1
-    rolls += 1
+    val i = sum - minSum
+    counts(i) += 1
+    numRolls += 1
     displayStatus()
 
-    val x = spacing + (sum - 2) * (barWidth + spacing)
+    val x = spacing + i * (barWidth + spacing)
     val y = height - 20
-    val countThisBar = counts(sum)
+    val countThisBar = counts(i)
     val barHeight = countThisBar
     val barPieceY = y - barHeight
 
@@ -48,12 +58,20 @@ class DiceHistogram extends PApplet {
     line(x, barPieceY, x + barWidth, barPieceY)
     
     // Draw, in a darker color, the segment of the line corresponding to the combination of dice values
-    val rollsForThisSum = outcomes(sum)
-    val segmentWidth = barWidth / rollsForThisSum.size
-    val indexOfThisRollForThisSum = rollsForThisSum.indexWhere(t => t._1 == roll1 && t._2 == roll2)
+    val combinationsForThisSum = combinationsBySum(sum)
+    val segmentWidth = barWidth / combinationsForThisSum.size
+    val indexOfThisRollForThisSum = combinationsForThisSum.indexWhere(_ == rolls)
     val lineStartX = x + segmentWidth * indexOfThisRollForThisSum
     stroke(0, 0, 128)
     line(lineStartX, barPieceY, lineStartX + segmentWidth, barPieceY)
+    noStroke()
+    
+    // Draw a vertical thin bar, showing the expected counts for this sum, given the number of rolls so far
+    val probabilityOfThisRoll = combinationsForThisSum.size / math.pow(numSides, numDice)
+    val expectedCountsOfThisRoll = probabilityOfThisRoll * numRolls
+    stroke(0, 0, 0)
+    line(x - 1, y, x - 1, y - expectedCountsOfThisRoll.toInt)
+    line(x + barWidth + 1, y, x + barWidth + 1, y - expectedCountsOfThisRoll.toInt)
     noStroke()
 
     // Clear any previously-drawn count atop the bar
@@ -81,7 +99,7 @@ class DiceHistogram extends PApplet {
   }
 
   private def reset(): Unit = {
-    rolls = 0
+    numRolls = 0
     for (i <- 0 until counts.length) {
       counts(i) = 0
     }
@@ -100,13 +118,13 @@ class DiceHistogram extends PApplet {
       displayedFrameRate = frameRate.toInt
       frameRateLastDisplayedTime = now
     }
-    text(s"Rolls: ${fmt(rolls)}, Frame rate: ${fmt(displayedFrameRate)}", width / 2, 10)
+    text(s"Rolls: ${fmt(numRolls)}, Frame rate: ${fmt(displayedFrameRate)}", width / 2, 10)
   }
 
   private def drawStatic() {
     background(255)
-    0 to 10 foreach(i => {
-      val barNum = i + 2
+    0 until numBars foreach(i => {
+      val barNum = i + minSum
       val x = spacing + i * (barWidth + spacing)
       val y = height - 20
       fill(0)
