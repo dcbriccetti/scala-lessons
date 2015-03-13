@@ -19,8 +19,6 @@ class DiceHistogram extends PApplet {
   val font2 = createFont("Helvetica", 10)
   val nf = NumberFormat.getInstance
   nf.setMaximumFractionDigits(0)
-  def fmt[A](num: A) = nf.format(num)
-
   val combinations = generateCombinations(numDice)
   val combinationsBySum = combinations.groupBy(_.sum)
 
@@ -108,7 +106,7 @@ class DiceHistogram extends PApplet {
     drawStatic()
   }
 
-  var frameRateLastDisplayedTime = 0L
+  private var frameRateLastDisplayedTime = 0L
 
   private def displayStatus(): Unit = {
     fill(255)
@@ -135,7 +133,7 @@ class DiceHistogram extends PApplet {
     })
   }
 
-  def generateCombinations(numDice: Int): List[List[Int]] =
+  private def generateCombinations(numDice: Int): List[List[Int]] =
     if (numDice > 0)
       for {
         h <- (1 to numSides).toList
@@ -143,6 +141,8 @@ class DiceHistogram extends PApplet {
       } yield h :: t
     else 
       List(Nil)
+
+  private def fmt[A](num: A) = nf.format(num)
 }
 
 object DiceHistogram {
