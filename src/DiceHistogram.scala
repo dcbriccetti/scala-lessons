@@ -1,12 +1,12 @@
 import java.text.NumberFormat
 import scala.util.Random
-import processing.core.{PConstants, PApplet}
+import processing.core.{PConstants, PApplet} // Comes from core.jar in Processing (processing.org) directory
 import PConstants.CENTER
 
 class DiceHistogram extends PApplet {
-  val barWidth = 60 // Best if a multiple of 1–6, the range of numbers of ways to roll 2–12 (e.g., 6 ways to roll 7)
+  val barWidth = 60  // Best if a multiple of 1–6, the range of numbers of ways to roll 2–12 (e.g., 6 ways to roll 7)
   val spacing = 7
-  val numDice = 3
+  val numDice = 2
   val numSides = 6
   val minSum = numDice
   val maxSum = numDice * numSides
@@ -21,13 +21,9 @@ class DiceHistogram extends PApplet {
   nf.setMaximumFractionDigits(0)
   def fmt[A](num: A) = nf.format(num)
 
-  val combinations: Seq[Seq[Int]] = numDice match {
-    case 1 => for (a <- 1 to numSides) yield Seq(a)
-    case 2 => for (a <- 1 to numSides; b <- 1 to numSides) yield Seq(a, b)
-    case 3 => for (a <- 1 to numSides; b <- 1 to numSides; c <- 1 to numSides) yield Seq(a, b, c)
-  }
+  val combinations = generateCombinations(numDice)
   val combinationsBySum = combinations.groupBy(_.sum)
-  
+
   override def setup() {
     size(barWidth * numBars + spacing * (numBars + 1), 600)
     textAlign(CENTER, CENTER)
@@ -39,7 +35,7 @@ class DiceHistogram extends PApplet {
 
   override def draw() = {
     def roll = rg.nextInt(numSides) + 1
-    val rolls = 1 to numDice map(n => roll)
+    val rolls = 1 to numDice map (n => roll)
     val sum = rolls.sum
 
     val i = sum - minSum
@@ -65,7 +61,7 @@ class DiceHistogram extends PApplet {
     else
       stroke(255, 200, 200)
     line(x, barPieceY, x + barWidth, barPieceY)
-    
+
     // Draw, in a darker color, the segment of the line corresponding to the combination of dice values
     val segmentWidth = barWidth / combinationsForThisSum.size
     val indexOfThisRollForThisSum = combinationsForThisSum.indexWhere(_ == rolls)
@@ -94,9 +90,9 @@ class DiceHistogram extends PApplet {
       reset()
     }
   }
-  
+
   private var pausing = false
-  
+
   override def keyPressed() {
     if (key == ' ') {
       pausing = ! pausing
@@ -113,7 +109,7 @@ class DiceHistogram extends PApplet {
   }
 
   var frameRateLastDisplayedTime = 0L
-  
+
   private def displayStatus(): Unit = {
     fill(255)
     rect(0, 0, width, 30)
@@ -138,6 +134,15 @@ class DiceHistogram extends PApplet {
       text(barNum.toString, x + barWidth / 2, y + 10)
     })
   }
+
+  def generateCombinations(numDice: Int): List[List[Int]] =
+    if (numDice > 0)
+      for {
+        h <- (1 to numSides).toList
+        t <- generateCombinations(numDice - 1)
+      } yield h :: t
+    else 
+      List(Nil)
 }
 
 object DiceHistogram {
