@@ -4,7 +4,7 @@ import scala.util.Random
 object HtmlEmitter extends App {
   val r = new Random()
   case class Robot(name: String, strength: Int)
-  val robots = (1 to 10).map(n => Robot(s"Robot $n", r.nextInt(101)))
+  val robots = 1 to 10 map(n => Robot(s"Robot $n", r.nextInt(101)))
   val p = new PrintWriter(new File("/tmp/robots.html"))
 
   p.println("<!DOCTYPE html>")
@@ -21,12 +21,12 @@ object HtmlEmitter extends App {
             </tr>
           </thead>
           <tbody>
-            {robots.map(r => {
+            {robots.map(r =>
             <tr>
               <td>{r.name}</td>
               <td>{r.strength}</td>
             </tr>
-            })}
+            )}
           </tbody>
         </table>
       </body>
