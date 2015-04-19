@@ -12,7 +12,7 @@ object Solution1 extends App {
         case (true,  false) => Some("÷4")
         case (true,  true ) => None
       }
-    })).flatten.mkString("\n")
+    })).flatten.mkString(", ")
   )
 }
 
@@ -24,6 +24,6 @@ object Solution2 extends App {
       else if (divBy(4))              Some("÷4")
       else if (divBy(7))              Some("÷7")
       else                            Some(n)
-    })).flatten.mkString("\n")
+    })).flatten.mkString(", ")
   )
 }
