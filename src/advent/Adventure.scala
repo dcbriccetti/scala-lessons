@@ -1,7 +1,5 @@
 package advent
 
-import io.StdIn.readLine
-
 object Adventure {
 
   class InventoryItem(val name: String)

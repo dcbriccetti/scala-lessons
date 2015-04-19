@@ -1,4 +1,3 @@
-import scala.io.StdIn._
 
 object StateCodes extends App {
   val states = Map(
