@@ -1,6 +1,8 @@
-/* Display the numbers from 1 to 100 that are not divisible by both
+/*
+Display the numbers from 1 to 100 that are not divisible by both
 4 and 7, but for those numbers divisible by 4, show ÷4 instead, and
-for those divisible by 7, show ÷7 instead. */
+for those divisible by 7, show ÷7 instead.
+*/
 
 object Solution1 extends App {
   println(
