@@ -100,9 +100,7 @@ class DiceHistogram extends PApplet {
 
   private def reset(): Unit = {
     numRolls = 0
-    for (i <- 0 until counts.length) {
-      counts(i) = 0
-    }
+    for (i <- counts.indices) counts(i) = 0
     drawStatic()
   }
 
