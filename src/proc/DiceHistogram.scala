@@ -1,7 +1,11 @@
+package proc
+
 import java.text.NumberFormat
+
+import processing.core.PApplet
+import processing.core.PConstants.CENTER
+
 import scala.util.Random
-import processing.core.{PConstants, PApplet} // Comes from core.jar in Processing (processing.org) directory
-import PConstants.CENTER
 
 class DiceHistogram extends PApplet {
   val barWidth = 60  // Best if a multiple of 1–6, the range of numbers of ways to roll 2–12 (e.g., 6 ways to roll 7)
@@ -144,5 +148,5 @@ class DiceHistogram extends PApplet {
 }
 
 object DiceHistogram {
-  def main(args: Array[String]) = PApplet.main("DiceHistogram")
+  def main(args: Array[String]) = PApplet.main("proc.DiceHistogram")
 }
