@@ -1,21 +1,18 @@
 package proc
 
 import java.awt.event.KeyEvent
-
+import scala.util.Random.nextInt
 import processing.core.{PConstants, PApplet}
-
-import scala.util.Random
 
 class Stars extends PApplet {
 
-  val r = new Random()
   var rot = 0f
   val s = 200
   val NumPlanes = 5
   val NumStars = 4000
   var organizing = false
 
-  def c = 1 to NumStars map(n => r.nextInt(s) - s / 2)
+  def c = 1 to NumStars map(n => nextInt(s) - s / 2)
   def p1 = 0 until NumStars map(n => (n * s / NumPlanes) % s - s / 2)
   val xs1 = c.map(_.toFloat).toArray
   val xs2 = p1
@@ -52,7 +49,10 @@ class Stars extends PApplet {
     z += .1f
   }
 
-  override def keyPressed(e: KeyEvent) = if (e.getKeyChar == ' ') organizing = true
+  override def keyPressed(e: KeyEvent) = {
+    super.keyPressed(e)
+    if (e.getKeyChar == ' ') organizing = true
+  }
 }
 
 object Stars {

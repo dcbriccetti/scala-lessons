@@ -1,12 +1,11 @@
 package proc
 import processing.core.PApplet
 
-class Lines extends PApplet {
+class Template extends PApplet {
   override def draw() = {
-    line(0, 0, mouseX, mouseY)
   }
 }
 
-object Lines {
+object Template {
   def main(args: Array[String]) = PApplet.main("proc.Template")
 }

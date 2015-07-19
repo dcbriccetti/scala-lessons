@@ -3,18 +3,16 @@ package proc
 import java.awt.event.KeyEvent
 
 import processing.core.PApplet
-import scala.util.Random
+import scala.util.Random.nextInt
 
 class MultiColoredLines extends PApplet {
-
-  val r = new Random()
 
   override def setup() = {
     size(displayWidth, displayHeight)
   }
 
   override def draw() = {
-    def cv = r.nextInt(256)
+    def cv = nextInt(256)
     stroke(cv, cv, cv)
     0 until width by 100 foreach(x => {
       line(x, 0, mouseX, mouseY)

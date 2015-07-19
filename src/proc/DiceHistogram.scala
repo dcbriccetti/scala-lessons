@@ -1,11 +1,9 @@
 package proc
 
 import java.text.NumberFormat
-
+import scala.util.Random.nextInt
 import processing.core.PApplet
 import processing.core.PConstants.CENTER
-
-import scala.util.Random
 
 class DiceHistogram extends PApplet {
   val barWidth = 60  // Best if a multiple of 1–6, the range of numbers of ways to roll 2–12 (e.g., 6 ways to roll 7)
@@ -16,7 +14,6 @@ class DiceHistogram extends PApplet {
   val maxSum = numDice * numSides
   val numBars = maxSum - minSum + 1
   val counts = new Array[Int](numBars)
-  val rg = new Random()
   var numRolls = 0
   var displayedFrameRate = 0
   val font1 = createFont("Helvetica", 14)
@@ -36,7 +33,7 @@ class DiceHistogram extends PApplet {
   }
 
   override def draw() = {
-    def roll = rg.nextInt(numSides) + 1
+    def roll = nextInt(numSides) + 1
     val rolls = 1 to numDice map (n => roll)
     val sum = rolls.sum
 

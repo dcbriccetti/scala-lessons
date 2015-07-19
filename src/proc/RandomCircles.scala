@@ -1,21 +1,19 @@
 package proc
 
 import java.awt.event.KeyEvent
-import scala.util.Random
+import scala.util.Random.nextInt
 import processing.core.PApplet
 
 class RandomCircles extends PApplet {
-
-  val r = new Random()
 
   override def setup() = {
     size(displayWidth, displayHeight)
   }
 
   override def draw() = {
-    def rc = r.nextInt(256)
+    def rc = nextInt(256)
     fill(rc, rc, rc, 128)
-    val w = 20 + r.nextInt(width / 4)
+    val w = 20 + nextInt(width / 4)
     ellipse(mouseX, mouseY, w, w)
   }
 
