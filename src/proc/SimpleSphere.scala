@@ -6,7 +6,6 @@ class SimpleSphere extends PApplet {
 
   override def setup(): Unit = {
     size(500, 500, PConstants.OPENGL)
-    smooth()
     fill(255, 255, 0)
   }
 
