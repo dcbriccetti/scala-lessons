@@ -12,8 +12,8 @@ class ColoredLines extends PApplet {
   }
 
   override def draw() = {
-    def cv = r.nextInt(256)
-    stroke(cv, cv, cv)
+    def colorPart = r.nextInt(256)
+    stroke(colorPart, colorPart, colorPart)
     line(width / 2, height / 2, mouseX, mouseY)
   }
 }
