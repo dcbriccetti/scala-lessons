@@ -8,5 +8,5 @@ class Lines extends PApplet {
 }
 
 object Lines {
-  def main(args: Array[String]) = PApplet.main("proc.Template")
+  def main(args: Array[String]) = PApplet.main("proc.Lines")
 }

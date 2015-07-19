@@ -13,8 +13,9 @@ class RandomCircles extends PApplet {
   override def draw() = {
     def rc = nextInt(256)
     fill(rc, rc, rc, 128)
-    val w = 20 + nextInt(width / 4)
-    ellipse(mouseX, mouseY, w, w)
+    val MinDiameter = 20
+    val diameter = MinDiameter + nextInt(width / 4)
+    ellipse(mouseX, mouseY, diameter, diameter)
   }
 
   override def keyPressed(e: KeyEvent) = {
