@@ -1,6 +1,6 @@
 package proc
 
-import java.awt.event.KeyEvent
+import processing.event.KeyEvent
 import java.awt.event.KeyEvent._
 import processing.core.{PConstants, PApplet}
 
@@ -9,8 +9,11 @@ class Sphere extends PApplet {
   var lightsOn = true
   var strokeOn = true
 
-  override def setup(): Unit = {
+  override def settings(): Unit = {
     size(500, 500, PConstants.OPENGL)
+  }
+
+  override def setup(): Unit = {
     smooth()
     fill(255, 255, 0)
   }

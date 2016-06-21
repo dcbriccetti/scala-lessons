@@ -5,7 +5,7 @@ import scala.util.Random.nextInt
 
 class ColoredLines extends PApplet {
 
-  override def setup() = {
+  override def settings() = {
     size(displayWidth, displayHeight)
   }
 

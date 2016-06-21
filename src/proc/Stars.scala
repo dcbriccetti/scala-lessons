@@ -1,6 +1,6 @@
 package proc
 
-import java.awt.event.KeyEvent
+import processing.event.KeyEvent
 import scala.util.Random.nextInt
 import processing.core.{PConstants, PApplet}
 
@@ -22,8 +22,11 @@ class Stars extends PApplet {
   val dxs = xs1.zip(xs2).map(t => (t._2 - t._1) / steps.toFloat)
   var z = 100f
 
-  override def setup() = {
+  override def settings() = {
     size(500, 500, PConstants.OPENGL)
+  }
+
+  override def setup() = {
     frameRate(60)
   }
 
@@ -51,7 +54,7 @@ class Stars extends PApplet {
 
   override def keyPressed(e: KeyEvent) = {
     super.keyPressed(e)
-    if (e.getKeyChar == ' ') organizing = true
+    if (e.getKey == ' ') organizing = true
   }
 }
 

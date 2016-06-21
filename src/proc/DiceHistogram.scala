@@ -23,8 +23,11 @@ class DiceHistogram extends PApplet {
   val combinations = generateCombinations(numDice)
   val combinationsBySum = combinations.groupBy(_.sum)
 
-  override def setup() {
+  override def settings(): Unit = {
     size(barWidth * numBars + spacing * (numBars + 1), 600)
+  }
+
+  override def setup() {
     textAlign(CENTER, CENTER)
     smooth()
     noStroke()

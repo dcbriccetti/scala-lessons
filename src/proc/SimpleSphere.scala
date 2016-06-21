@@ -4,8 +4,11 @@ import processing.core.{PConstants, PApplet}
 
 class SimpleSphere extends PApplet {
 
-  override def setup(): Unit = {
+  override def settings(): Unit = {
     size(500, 500, PConstants.OPENGL)
+  }
+
+  override def setup(): Unit = {
     fill(255, 255, 0)
   }
 

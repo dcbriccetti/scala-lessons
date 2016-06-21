@@ -1,12 +1,12 @@
 package proc
 
-import java.awt.event.KeyEvent
+import processing.event.KeyEvent
 import scala.util.Random.nextInt
 import processing.core.PApplet
 
 class RandomCircles extends PApplet {
 
-  override def setup() = {
+  override def settings() = {
     size(displayWidth, displayHeight)
   }
 
@@ -20,7 +20,7 @@ class RandomCircles extends PApplet {
 
   override def keyPressed(e: KeyEvent) = {
     super.keyPressed(e)
-    if (e.getKeyChar == ' ') {
+    if (e.getKey == ' ') {
       background(255)
     }
   }

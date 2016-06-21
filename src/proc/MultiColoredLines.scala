@@ -1,13 +1,13 @@
 package proc
 
-import java.awt.event.KeyEvent
+import processing.event.KeyEvent
 
 import processing.core.PApplet
 import scala.util.Random.nextInt
 
 class MultiColoredLines extends PApplet {
 
-  override def setup() = {
+  override def settings() = {
     size(displayWidth, displayHeight)
   }
 
@@ -21,7 +21,7 @@ class MultiColoredLines extends PApplet {
 
   override def keyPressed(e: KeyEvent) = {
     super.keyPressed(e)
-    if (e.getKeyChar == ' ') {
+    if (e.getKey == ' ') {
       background(255)
     }
   }

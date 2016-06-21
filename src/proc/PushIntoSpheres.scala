@@ -3,8 +3,12 @@ package proc
 import processing.core.{PConstants, PApplet}
 
 class PushIntoSpheres extends PApplet {
-  override def setup(): Unit = {
+
+  override def settings(): Unit = {
     size(700, 697, PConstants.OPENGL)
+  }
+
+  override def setup(): Unit = {
     smooth()
     fill(0, 0, 255)
     background(255)
