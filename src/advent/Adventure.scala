@@ -4,11 +4,17 @@ object Adventure {
 
   class InventoryItem(val name: String)
 
+  case class Money(dollars: Int) extends InventoryItem("$" + dollars)
+
   case class Place(
     title:    String,
     prep:     String = "at",
     opAction: Option[() => Unit] = None,
     goal:     Boolean = false)
+
+  case class Transition(
+    place:    Place,
+    mustHave: Seq[InventoryItem] = Nil)
 
   case class GameState(
     var place:      Place,
@@ -19,7 +25,6 @@ object Adventure {
   def main(args: Array[String]) {
 
     object BusPass extends InventoryItem("a bus pass")
-    case class Money(dollars: Int) extends InventoryItem("$" + dollars)
     object CodeBreakingBook extends InventoryItem("a book on code breaking")
 
     val livingRoom  = Place("your living room", prep = "in")
@@ -35,7 +40,6 @@ object Adventure {
     val ladder      = Place("a ladder hidden inside the kiosk", prep = "on")
     val treasureRoom= Place("a room full of treasure", prep = "in", goal = true)
 
-    case class Transition(place: Place, mustHave: Seq[InventoryItem] = Nil)
     val transitionsByPlace = {
       implicit def placeToTransition(place: Place) = Transition(place)
       Map[Place, Seq[Transition]](
