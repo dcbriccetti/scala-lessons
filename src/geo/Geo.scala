@@ -1,5 +1,6 @@
 package geo
 
+import java.io._
 import java.net.{URL, URLEncoder}
 
 import processing.core.{PApplet, PConstants}
@@ -11,44 +12,62 @@ class Geo extends PApplet {
   val area = "94549"
   val startTime = System.currentTimeMillis
 
-  case class Place(name: String, vicinity: String, lat: Double, long: Double, elevation: Double)
+  val placeTypes = Seq("school", "park", "book_store").par
 
-  val names = Seq("park", "school", "store").par
+  val cacheFile = new File("/tmp/geo.cache")
+  val places =
+    if (cacheFile.exists) {
+      val ois = new ObjectInputStream(new FileInputStream(cacheFile))
+      val p = ois.readObject.asInstanceOf[Seq[Place]]
+      ois.close()
+      p
+    } else {
+      val p = for {
+        (areaLat, areaLong) <- findArea(area).toSeq
+        placeType <- placeTypes
+        place <- findNearbyPlaces(areaLat, areaLong, placeType)
+      } yield place
+      val oos = new ObjectOutputStream(new FileOutputStream(cacheFile))
+      oos.writeObject(p)
+      oos.close()
+      p
+    }
 
-  val places = for {
-    (areaLat, areaLong)   <- findArea(area).toSeq
-    searchName            <- names
-    (name, vicinity, placeLat, placeLong)
-                          <- findNearbyPlaces(areaLat, areaLong, searchName)
-    elevation              = findElev(placeLat, placeLong)
-  } yield {
-    Place(name, vicinity, placeLat.toDouble, placeLong.toDouble, elevation)
-  }
-  val minLat  = places.map(_.lat).min
-  val maxLat  = places.map(_.lat).max
-  val latRange = maxLat - minLat
-  val minLong = places.map(_.long).min
-  val maxLong = places.map(_.long).max
+  val minLat    = places.map(_.lat).min
+  val maxLat    = places.map(_.lat).max
+  val latRange  = maxLat - minLat
+
+  val minLong   = places.map(_.long).min
+  val maxLong   = places.map(_.long).max
   val longRange = maxLong - minLong
-  val minElev = places.map(_.elevation).min
-  val maxElev = places.map(_.elevation).max
+
+  val minElev   = places.map(_.elevation).min
+  val maxElev   = places.map(_.elevation).max
   val elevRange = maxElev - minElev
-  val ScreenWidth = 500
-  val ScreenHeight = 500
-  def latToScreen(lat: Double) = ((lat - minLat) / latRange * ScreenWidth).toFloat - ScreenWidth / 2
-  def longToScreen(long: Double) = ((long - minLong) / longRange * ScreenHeight).toFloat - ScreenHeight / 2
-  def elevToScreen(elev: Double) = ((elev - minElev) / elevRange * ScreenHeight / 5).toFloat - ScreenHeight / 4
+
+  val ScreenWidth = 1440
+  val ScreenHeight = 1440
+  val ScaleFactor = Math.min(ScreenHeight, ScreenWidth) * 0.8
+  def latToScreen (lat:  Double) = ScreenHeight - ((lat - minLat) / latRange * ScaleFactor).toFloat - ScreenHeight / 2
+  def longToScreen(long: Double) = ((long - minLong) / longRange * ScaleFactor).toFloat - ScreenWidth  / 2
+  def elevToScreen(elev: Double) = ((elev - minElev) / elevRange * ScreenHeight / 2).toFloat - ScreenHeight / 4
 
   override def settings(): Unit = {
     size(ScreenWidth, ScreenHeight, PConstants.P3D)
     smooth(8)
   }
 
+  override def setup(): Unit = {
+    textFont(createFont("Helvetica", 14))
+  }
+
   override def draw() = {
     background(0)
     translate(ScreenWidth / 2, ScreenHeight / 2, 0)
-    rotateX(mouseY.toFloat / ScreenHeight * math.Pi.toFloat)
-    rotateZ(mouseX.toFloat / ScreenWidth * math.Pi.toFloat)
+    val globalXRot = mouseY.toFloat / ScreenHeight * math.Pi.toFloat
+    rotateX(globalXRot)
+    val globalZRot = mouseX.toFloat / ScreenWidth * math.Pi.toFloat
+    rotateZ(globalZRot)
     noFill()
     stroke(128)
     box(ScreenWidth, ScreenHeight, ScreenHeight / 2)
@@ -56,9 +75,12 @@ class Geo extends PApplet {
       place <- places
     } {
       pushMatrix()
-      translate(latToScreen(place.lat), longToScreen(place.long), elevToScreen(place.elevation))
+      translate(longToScreen(place.long), latToScreen(place.lat), elevToScreen(place.elevation))
       stroke(0, 255, 0)
-      box(10, 10, 5)
+      sphere(5)
+      rotateZ(-globalZRot)
+      rotateX(-globalXRot)
+      text(place.name, 7, 3)
       popMatrix()
     }
   }
@@ -75,7 +97,7 @@ class Geo extends PApplet {
   private def findNearbyPlaces(lat: String, long: String, placeType: String) = {
     log("Looking for " + placeType)
     val placeTypeEncoded = URLEncoder.encode(placeType, "utf8")
-    val urlString = s"https://maps.googleapis.com/maps/api/place/nearbysearch/xml?key=$apiKey&type=$placeTypeEncoded&location=$lat,$long&radius=3000"
+    val urlString = s"https://maps.googleapis.com/maps/api/place/nearbysearch/xml?key=$apiKey&type=$placeTypeEncoded&location=$lat,$long&radius=10000"
     println(urlString)
     val response = XML.load(new URL(urlString))
     (response \ "status").text match {
@@ -86,7 +108,8 @@ class Geo extends PApplet {
           name = (result \ "name").text
           vicinity = (result \ "vicinity").text
           (lat, long) = latLong(result \ "geometry" \ "location")
-        } yield (name, vicinity, lat, long)
+          elevation = findElev(lat, long)
+        } yield Place(name, vicinity, lat.toDouble, long.toDouble, elevation)
       case _ =>
         Seq()
     }
@@ -111,3 +134,5 @@ object Geo {
   def main(args: Array[String]): Unit = PApplet.main("geo.Geo")
 }
 
+@SerialVersionUID(1L)
+case class Place(name: String, vicinity: String, lat: Double, long: Double, elevation: Double)
