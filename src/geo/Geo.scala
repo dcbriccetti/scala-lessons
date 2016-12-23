@@ -2,10 +2,9 @@ package geo
 
 import java.io._
 import java.net.{URL, URLEncoder}
+import scala.xml.{NodeSeq, XML}
 
 import processing.core.{PApplet, PConstants}
-
-import scala.xml.{NodeSeq, XML}
 
 class Geo extends PApplet {
   val apiKey = Secrets.apiKey  // Get an API key from https://developers.google.com/places/
@@ -14,32 +13,36 @@ class Geo extends PApplet {
 
   val placeTypes = Seq("school", "park", "book_store").par
 
-  val cacheFile = new File("/tmp/geo.cache")
-  val places = cachedData getOrElse
-    cache(for {
+  val places: Seq[Place] = cache {
+    for {
       (areaLat, areaLong) <- findArea(area).toSeq
       placeType           <- placeTypes
       place               <- findNearbyPlaces(areaLat, areaLong, placeType)
-    } yield place)
-
-  val minLat    = places.map(_.lat).min
-  val maxLat    = places.map(_.lat).max
-  val latRange  = maxLat - minLat
-
-  val minLong   = places.map(_.long).min
-  val maxLong   = places.map(_.long).max
-  val longRange = maxLong - minLong
-
-  val minElev   = places.map(_.elevation).min
-  val maxElev   = places.map(_.elevation).max
-  val elevRange = maxElev - minElev
+    } yield place
+  }
 
   val ScreenWidth = 1440
   val ScreenHeight = 1440
   val ScaleFactor = Math.min(ScreenHeight, ScreenWidth) * 0.8
-  def latToScreen (lat:  Double) = ScreenHeight - ((lat - minLat) / latRange * ScaleFactor).toFloat - ScreenHeight / 2
-  def longToScreen(long: Double) = ((long - minLong) / longRange * ScaleFactor).toFloat - ScreenWidth  / 2
-  def elevToScreen(elev: Double) = ((elev - minElev) / elevRange * ScreenHeight / 2).toFloat - ScreenHeight / 4
+  val ElevScreenFraction = ScreenHeight / 2
+
+  abstract class Transformer(property: Place => Double) {
+    val min    = places.map(property).min
+    val max    = places.map(property).max
+    val range  = max - min
+    def normalizeAndScale(value: Double) = (normalize(value) * ScaleFactor).toFloat
+    def normalize(value: Double) = (value - min) / range
+    def toScreen(value: Double): Float
+  }
+  object latTransformer extends Transformer(_.lat) {
+    override def toScreen(value: Double) = ScreenHeight - normalizeAndScale(value) - ScreenHeight / 2
+  }
+  object longTransformer extends Transformer(_.long) {
+    override def toScreen(value: Double) = normalizeAndScale(value) - ScreenWidth  / 2
+  }
+  object elevTransformer extends Transformer(_.elevation) {
+    override def toScreen(value: Double) = (normalize(value) * ElevScreenFraction).toFloat - ScreenHeight / 4
+  }
 
   override def settings(): Unit = {
     size(ScreenWidth, ScreenHeight, PConstants.P3D)
@@ -52,24 +55,29 @@ class Geo extends PApplet {
 
   override def draw() = {
     background(0)
+
     translate(ScreenWidth / 2, ScreenHeight / 2, 0)
     val globalXRot = mouseY.toFloat / ScreenHeight * math.Pi.toFloat
     rotateX(globalXRot)
     val globalZRot = mouseX.toFloat / ScreenWidth * math.Pi.toFloat
     rotateZ(globalZRot)
+
     noFill()
     stroke(128)
-    box(ScreenWidth, ScreenHeight, ScreenHeight / 2)
-    for {
-      place <- places
-    } {
+    box(ScreenWidth, ScreenHeight, ElevScreenFraction)
+
+    places foreach {place =>
       pushMatrix()
-      translate(longToScreen(place.long), latToScreen(place.lat), elevToScreen(place.elevation))
+
+      translate(longTransformer.toScreen(place.long),
+        latTransformer.toScreen(place.lat), elevTransformer.toScreen(place.elevation))
       stroke(0, 255, 0)
       sphere(5)
+
       rotateZ(-globalZRot)
       rotateX(-globalXRot)
       text(place.name, 7, 3)
+
       popMatrix()
     }
   }
@@ -115,20 +123,20 @@ class Geo extends PApplet {
     (text("lat"), text("lng"))
   }
 
-  private def cachedData = {
+  private def cache[A](compute: => A): A = {
+    val cacheFile = new File("/tmp/geo.cache")
     if (cacheFile.exists) {
       val ois = new ObjectInputStream(new FileInputStream(cacheFile))
-      val places = ois.readObject.asInstanceOf[Seq[Place]]
+      val places = ois.readObject.asInstanceOf[A]
       ois.close()
-      Some(places)
-    } else None
-  }
-
-  private def cache(places: Seq[Place]) = {
-    val oos = new ObjectOutputStream(new FileOutputStream(cacheFile))
-    oos.writeObject(places)
-    oos.close()
-    places
+      places
+    } else {
+      val places = compute
+      val oos = new ObjectOutputStream(new FileOutputStream(cacheFile))
+      oos.writeObject(places)
+      oos.close()
+      places
+    }
   }
 
   private def log(msg: String): Unit =
