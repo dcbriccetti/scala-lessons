@@ -5,7 +5,7 @@ import processing.core.{PConstants, PApplet}
 class SimpleSphere extends PApplet {
 
   override def settings(): Unit = {
-    size(500, 500, PConstants.OPENGL)
+    size(500, 500, PConstants.P3D)
   }
 
   override def setup(): Unit = {

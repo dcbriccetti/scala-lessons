@@ -15,23 +15,12 @@ class Geo extends PApplet {
   val placeTypes = Seq("school", "park", "book_store").par
 
   val cacheFile = new File("/tmp/geo.cache")
-  val places =
-    if (cacheFile.exists) {
-      val ois = new ObjectInputStream(new FileInputStream(cacheFile))
-      val p = ois.readObject.asInstanceOf[Seq[Place]]
-      ois.close()
-      p
-    } else {
-      val p = for {
-        (areaLat, areaLong) <- findArea(area).toSeq
-        placeType <- placeTypes
-        place <- findNearbyPlaces(areaLat, areaLong, placeType)
-      } yield place
-      val oos = new ObjectOutputStream(new FileOutputStream(cacheFile))
-      oos.writeObject(p)
-      oos.close()
-      p
-    }
+  val places = cachedData getOrElse
+    cache(for {
+      (areaLat, areaLong) <- findArea(area).toSeq
+      placeType           <- placeTypes
+      place               <- findNearbyPlaces(areaLat, areaLong, placeType)
+    } yield place)
 
   val minLat    = places.map(_.lat).min
   val maxLat    = places.map(_.lat).max
@@ -124,6 +113,22 @@ class Geo extends PApplet {
   private def latLong(loc: NodeSeq) = {
     def text(elem: String) = (loc \ elem).text
     (text("lat"), text("lng"))
+  }
+
+  private def cachedData = {
+    if (cacheFile.exists) {
+      val ois = new ObjectInputStream(new FileInputStream(cacheFile))
+      val places = ois.readObject.asInstanceOf[Seq[Place]]
+      ois.close()
+      Some(places)
+    } else None
+  }
+
+  private def cache(places: Seq[Place]) = {
+    val oos = new ObjectOutputStream(new FileOutputStream(cacheFile))
+    oos.writeObject(places)
+    oos.close()
+    places
   }
 
   private def log(msg: String): Unit =

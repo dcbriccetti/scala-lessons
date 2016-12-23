@@ -23,7 +23,7 @@ class Stars extends PApplet {
   var z = 100f
 
   override def settings() = {
-    size(500, 500, PConstants.OPENGL)
+    size(800, 800, PConstants.OPENGL)
   }
 
   override def setup() = {
@@ -49,7 +49,7 @@ class Stars extends PApplet {
       })
     }
     rot += .03f
-    z += .1f
+    z += .02f
   }
 
   override def keyPressed(e: KeyEvent) = {

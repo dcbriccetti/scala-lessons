@@ -12,9 +12,9 @@ class MultiDraw(hhgs: Seq[(Turtle, Boolean)], sideLength: Int) {
             hhgs.foreach(hhg => {
                 val t = hhg._1
                 val outside = hhg._2
-                //if (outside && skipSides.contains(iSide)) t.penUp() else t.penDown()
+                if (outside && skipSides.contains(iSide)) t.penUp() else t.penDown()
                 t.forward(sideLength)
-                t.right(360 / numSides)
+                t.right(360 / 6)
             })
         }
     }
@@ -27,7 +27,7 @@ class MultiDraw(hhgs: Seq[(Turtle, Boolean)], sideLength: Int) {
             hhgs.foreach(_._1.right(60))
         }
     }
-} //> defined class MultiDraw //> warning: previously defined object MultiDraw is not a companion to class MultiDraw. //> Companions must be defined together; you may wish to use :paste mode for this.
+} //> defined class MultiDraw
     
 def makeTurtle(x: Int, y: Int) = {
     val t = newTurtle(x, y)
@@ -37,7 +37,7 @@ def makeTurtle(x: Int, y: Int) = {
 } //> makeTurtle: (x: Int, y: Int)net.kogics.kojo.core.Turtle
 
 val sideLength = 50 //> sideLength: Int = 50
-val apothem = sideLength / (2 * Math.tan(Math.toRadians(180) / numSides)) //> apothem: Double = 43.30127018922194
+val apothem = sideLength / (2 * Math.tan(Math.toRadians(180) / 6)) //> apothem: Double = 43.30127018922194
 val hspace = Math.round(2 * apothem).toInt //> hspace: Int = 87
 val vspace = 3 * sideLength //> vspace: Int = 150
 val centers = Seq(
@@ -48,6 +48,6 @@ val centers = Seq(
 
 clear()
 invisible()
-val hhgs = centers.map(center => (makeTurtle(center._1, center._2), center._3)) //> hhgs: Seq[(net.kogics.kojo.core.Turtle, Boolean)] = List((net.kogics.kojo.turtle.Turtle@77f7e4c7,true), (net.kogics.kojo.turtle.Turtle@33cd0259,true), (net.kogics.kojo.turtle.Turtle@58553ba0,true), (net.kogics.kojo.turtle.Turtle@43bdb2ae,true), (net.kogics.kojo.turtle.Turtle@5b1de040,false), (net.kogics.kojo.turtle.Turtle@66db87c,true))
-val multiDraw = new MultiDraw(hhgs, sideLength) //> multiDraw: MultiDraw = MultiDraw@53998a38
+val hhgs = centers.map(center => (makeTurtle(center._1, center._2), center._3)) //> hhgs: Seq[(net.kogics.kojo.core.Turtle, Boolean)] = List((net.kogics.kojo.turtle.Turtle@472cb01d,true), (net.kogics.kojo.turtle.Turtle@46de646c,true), (net.kogics.kojo.turtle.Turtle@329312cd,true), (net.kogics.kojo.turtle.Turtle@55b76aab,true), (net.kogics.kojo.turtle.Turtle@7cbc2c83,false), (net.kogics.kojo.turtle.Turtle@260e8c6f,true))
+val multiDraw = new MultiDraw(hhgs, sideLength) //> multiDraw: MultiDraw = MultiDraw@5e4294b2
 multiDraw.hexaHexagon()
