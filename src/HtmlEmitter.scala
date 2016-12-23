@@ -8,7 +8,7 @@ object HtmlEmitter extends App {
   val p = new PrintWriter(new File("/tmp/robots.html"))
 
   p.println("<!DOCTYPE html>")
-  p.println(/*
+  p.println(
     <html>
       <head></head>
       <body>
@@ -31,6 +31,6 @@ object HtmlEmitter extends App {
         </table>
       </body>
     </html>
-  */)
+  )
   p.close()
 }
