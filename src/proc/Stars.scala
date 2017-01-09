@@ -23,7 +23,7 @@ class Stars extends PApplet {
   var z = 100f
 
   override def settings() = {
-    size(800, 800, PConstants.OPENGL)
+    size(800, 800, PConstants.P3D)
   }
 
   override def setup() = {
