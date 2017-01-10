@@ -12,21 +12,22 @@ class BruteCircle extends PApplet {
   }
 
   override def setup(): Unit = {
-    frameRate(10000)
+    frameRate(30)
     background(0)
   }
 
   override def draw(): Unit = {
-    val x = (math.random * ScreenWidth).toInt
-    val y = (math.random * ScreenHeight).toInt
-    val xp = x - ScreenWidth / 2
-    val yp = y - ScreenHeight / 2
-    val distanceFromCenter = math.sqrt(xp * xp + yp * yp)
-    if (distanceFromCenter < radius && distanceFromCenter > radius - 50)
-      stroke(255, 165, 0)
-    else
-      stroke(64)
-    point(x, y)
+    translate(width / 2, height / 2)
+    1 to 100 foreach { _ =>
+      val x = (math.random * width).toInt - width / 2
+      val y = (math.random * height).toInt - height / 2
+      val distanceFromCenter = math.sqrt(x * x + y * y)
+      if (distanceFromCenter < radius && distanceFromCenter > radius - 50)
+        stroke(255, 165, 0)
+      else
+        stroke(64)
+      point(x, y)
+    }
   }
 }
 
