@@ -30,6 +30,7 @@ class BruteSphere extends PApplet {
     frameRate(60)
     background(0)
     font = createFont("Helvetica", 14)
+    textFont(font)
   }
 
   override def draw(): Unit = {
@@ -47,7 +48,6 @@ class BruteSphere extends PApplet {
     }
     popMatrix()
 
-    textFont(font)
     val textY = height - 10
     text(s"Points generated: ${fmt.format(numPointsGenerated)}", 10, textY)
     text(s"Points on “surface”: ${fmt.format(points.size)}", 220, textY)
