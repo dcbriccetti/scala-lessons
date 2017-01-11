@@ -22,7 +22,6 @@ class Spiral extends PApplet {
   override def setup(): Unit = {
     frameRate(120)
     background(0)
-    textFont(createFont("Helvetica", 14))
   }
 
   override def draw(): Unit = {
@@ -37,8 +36,9 @@ class Spiral extends PApplet {
         translate(width / 2, height / 2)
         val (x, y) = (cos(θ) * radius, sin(θ) * radius)
         val green = ((radius / StartingRadius) * 255).toInt
-        fill(0, green, 255 - green)
-        stroke(0, green, 255 - green)
+        val blue = 255 - green
+        fill  (0, green, blue)
+        stroke(0, green, blue)
         ellipse(x.toInt, -y.toInt, 7, 7)
         radius -= radiusDecrement
         θ = (θ + Δθ) % (2 * Pi)
