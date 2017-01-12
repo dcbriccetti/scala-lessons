@@ -8,7 +8,7 @@ import processing.event.KeyEvent
 /** Draws 3D spirals */
 class Spiral3D extends ScalaProcessingApplet with Common3dKeys {
   val random = new Random()
-  val ScreenDimension = 1080
+  val ScreenDimension = 1440
   val StartingRadius = ScreenDimension * 0.4
   val ΔImageXyzRotation = 0.01F
 
@@ -79,8 +79,8 @@ class Spiral3D extends ScalaProcessingApplet with Common3dKeys {
 
   class RandomDrawingOptions {
     val Δpointθ         = randBetween(0.02, 0.08)
-    val Δradius         = randBetween(-0.5, 0.01)
-    val ΔzPerPoint      = randBetween(-0.02, 0.02).toFloat
+    val Δradius         = randBetween(-0.5, -0.01)
+    val ΔzPerPoint      = randBetween(-0.06, 0.06).toFloat
     val ΔportionToDraw  = randBetween(0.005, 0.010)
     val gradient = new Gradient()
     val boxSize = 1 + random.nextInt(12)
