@@ -10,15 +10,13 @@ class Spiral3D extends ScalaProcessingApplet with Common3dKeys {
   val random = new Random()
   val ScreenDimension = 1080
   val StartingRadius = ScreenDimension * 0.4
-  val ΔImageθ = 0.01F
+  val ΔImageXyzRotation = 0.01F
 
   var portionToDraw = 0D
-  var imageθ = 0F
+  var imageXyzRotation = 0F
   var options = new RandomDrawingOptions()
 
-  override def settings(): Unit = {
-    size(ScreenDimension, ScreenDimension, PConstants.P3D)
-  }
+  override def settings(): Unit = size(ScreenDimension, ScreenDimension, PConstants.P3D)
 
   override def setup(): Unit = {
     frameRate(60)
@@ -29,13 +27,13 @@ class Spiral3D extends ScalaProcessingApplet with Common3dKeys {
   override def draw(): Unit = {
     if (! suspend) {
       noStroke()
-      drawPortion(portionToDraw, imageθ)
-      portionToDraw += options.portionToDrawΔ
+      drawPortion(portionToDraw, imageXyzRotation)
+      portionToDraw += options.ΔportionToDraw
       if (portionToDraw > 1) {
         portionToDraw = 0
         options = new RandomDrawingOptions()
       }
-      imageθ += ΔImageθ
+      imageXyzRotation += ΔImageXyzRotation
     }
   }
 
@@ -55,8 +53,10 @@ class Spiral3D extends ScalaProcessingApplet with Common3dKeys {
       var z = 0F
 
       while (radius > minRadiusThisPortion) {
-        val (x, y) = (cos(pointθ) * radius, sin(pointθ) * radius)
-        val proportionComplete = (radius / StartingRadius).toFloat
+        val x = cos(pointθ) * radius
+        val y = sin(pointθ) * radius
+
+        val proportionComplete = 1 - (radius / StartingRadius).toFloat
         val parts = options.gradient.colorsFor(proportionComplete)
         fill(parts._1, parts._2, parts._3)
 
@@ -65,7 +65,7 @@ class Spiral3D extends ScalaProcessingApplet with Common3dKeys {
           box(options.boxSize)
         }
 
-        radius -= options.radiusDecrement
+        radius += options.Δradius
         pointθ = (pointθ + options.Δpointθ) % (2 * Pi)
         z += options.ΔzPerPoint
       }
@@ -78,12 +78,12 @@ class Spiral3D extends ScalaProcessingApplet with Common3dKeys {
   }
 
   class RandomDrawingOptions {
-    val Δpointθ           = randBetween(0.02, 0.08)
-    val radiusDecrement   = randBetween(0.01, 0.5)
-    val ΔzPerPoint        = randBetween(-0.02, 0.02).toFloat
-    val portionToDrawΔ    = randBetween(0.005, 0.010)
+    val Δpointθ         = randBetween(0.02, 0.08)
+    val Δradius         = randBetween(-0.5, 0.01)
+    val ΔzPerPoint      = randBetween(-0.02, 0.02).toFloat
+    val ΔportionToDraw  = randBetween(0.005, 0.010)
     val gradient = new Gradient()
-    val boxSize = 1 + random.nextInt(15)
+    val boxSize = 1 + random.nextInt(12)
 
     private def randBetween(min: Double, max: Double) = {
       val range = max - min
