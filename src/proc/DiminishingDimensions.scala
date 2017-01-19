@@ -6,15 +6,15 @@ import processing.core.{PApplet, PConstants}
 import processing.event.KeyEvent
 
 class DiminishingDimensions extends ScalaProcessingApplet with Common3dKeys {
-  val PrismHeight = 600
-  val PrismWidth = (PrismHeight * 1.8).toInt
+  val Height = 600
+  val Width = (Height * 1.8).toInt
   val NumPoints = 5000
   var colors = randomColors
   var phase = 0
 
-  def randomCoords(max: Int = PrismHeight) = (0 until NumPoints).toArray.map(_ => nextInt(max) - max / 2)
-  def zeroes(max: Int = PrismHeight) = (0 until NumPoints).toArray.map(_ => 0)
-  var xs = zeroes(PrismWidth)
+  def randomCoords(max: Int = Height) = (0 until NumPoints).toArray.map(_ => nextInt(max) - max / 2)
+  def zeroes(max: Int = Height) = (0 until NumPoints).toArray.map(_ => 0)
+  var xs = zeroes(Width)
   var ys = zeroes()
   var zs = zeroes()
   var explodeMultipliers: Array[Array[Double]] = _
@@ -66,7 +66,7 @@ class DiminishingDimensions extends ScalaProcessingApplet with Common3dKeys {
           explodeStep = 0
           explodeMultipliers = (0 until NumPoints).toArray.map { _ =>
             def a = nextDouble * math.Pi * 2
-            val r = nextDouble * PrismWidth
+            val r = nextDouble * Width
             val (x, y, z) = sphericalToCartesian(r, a, a)
             Seq(x, y, z).toArray.map(_ / ExplodeSteps)
           }
