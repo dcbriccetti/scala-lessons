@@ -4,20 +4,17 @@ import scala.util.Random.nextInt
 import processing.core.{PConstants, PApplet}
 
 class DiminishingDimensions extends PApplet {
+  private val cubeSize = 900
+  private val NumPlanes = 6
+  private val PlaneThickness = cubeSize / NumPlanes
+  private val NumStars = 10000
+  private var phase = 0
+  private val phaseColors = Seq((255, 255, 255), (255, 255, 0), (0, 255, 0), (255, 255, 0))
 
-  var rot = 0f
-  val cubeSize = 900
-  val NumPlanes = 6
-  val PlaneThickness = cubeSize / NumPlanes
-  def planeX(x: Int) = x / PlaneThickness
-  val NumStars = 10000
-  var phase = 0
-  val phaseColors = Seq((255, 255, 255), (255, 255, 0), (0, 255, 0), (255, 255, 0))
-
-  def randomCoords = (0 until NumStars).toArray.map(_ => (nextInt(cubeSize) - cubeSize / 2).toFloat)
-  var xs = randomCoords
-  var ys = randomCoords
-  var zs = randomCoords
+  private def randomCoords = (0 until NumStars).toArray.map(_ => (nextInt(cubeSize) - cubeSize / 2).toFloat)
+  private var xs = randomCoords
+  private var ys = randomCoords
+  private var zs = randomCoords
 
   override def settings() = {
     size(1920, 1080, PConstants.P3D)
@@ -43,32 +40,6 @@ class DiminishingDimensions extends PApplet {
 
     var changed = false
 
-    def coalesceAxis(coords: Array[Float]) = {
-      var changed = false
-      0 until NumStars foreach { i =>
-        if (coords(i).toInt % PlaneThickness != 0) {
-          coords(i) -= 0.5f
-          changed = true
-        }
-      }
-      changed
-    }
-
-    def coalesceAllToPoint() = {
-      var changed = false
-      0 until NumStars foreach { i =>
-        Seq(xs, ys, zs).foreach { coords =>
-          val coordInt = coords(i).toInt
-          val chg = if (coordInt > 0) -1 else if (coordInt < 0) 1 else 0
-          if (chg != 0) {
-            coords(i) = coordInt + chg
-            changed = true
-          }
-        }
-      }
-      changed
-    }
-
     phase match {
       case 0 =>
         changed = coalesceAxis(xs)
@@ -89,6 +60,33 @@ class DiminishingDimensions extends PApplet {
     if (phase >= 0 && ! changed)
       phase = (phase + 1) % 4
   }
+
+  private def coalesceAxis(coords: Array[Float]) = {
+    var changed = false
+    0 until NumStars foreach { i =>
+      if (coords(i).toInt % PlaneThickness != 0) {
+        coords(i) -= 0.5f
+        changed = true
+      }
+    }
+    changed
+  }
+
+  private def coalesceAllToPoint() = {
+    var changed = false
+    0 until NumStars foreach { i =>
+      Seq(xs, ys, zs).foreach { coords =>
+        val coordInt = coords(i).toInt
+        val chg = if (coordInt > 0) -1 else if (coordInt < 0) 1 else 0
+        if (chg != 0) {
+          coords(i) = coordInt + chg
+          changed = true
+        }
+      }
+    }
+    changed
+  }
+
 }
 
 object DiminishingDimensions {
