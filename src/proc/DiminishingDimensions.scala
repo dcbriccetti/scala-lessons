@@ -17,9 +17,6 @@ class DiminishingDimensions extends ScalaProcessingApplet with Common3dKeys {
   var xs = zeroes(PrismWidth)
   var ys = zeroes()
   var zs = zeroes()
-  var newXs = randomCoords(PrismWidth)
-  var newYs = randomCoords()
-  var newZs = randomCoords()
   var explodeMultipliers: Array[Array[Double]] = _
   val ExplodeSteps = 200
   var explodeStep = 0
