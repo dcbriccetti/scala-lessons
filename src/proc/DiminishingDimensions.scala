@@ -12,14 +12,14 @@ class DiminishingDimensions extends ScalaProcessingApplet with Common3dKeys {
   var colors = randomColors
   var phase = 0
 
-  def randomCoords(max: Int = Height) = (0 until NumPoints).toArray.map(_ => nextInt(max) - max / 2)
-  def zeroes(max: Int = Height) = (0 until NumPoints).toArray.map(_ => 0)
-  var xs = zeroes(Width)
-  var ys = zeroes()
-  var zs = zeroes()
-  var explodeMultipliers: Array[Array[Double]] = _
+  def randomCoords(max: Int = Height) = forAllPointIndexes(_ => nextInt(max) - max / 2)
+  def zeroes = Array.fill(NumPoints)(0)
+  var xs = zeroes
+  var ys = zeroes
+  var zs = zeroes
   val ExplodeSteps = 200
   var explodeStep = 0
+  var explodeMultipliers = calculateExplodeMultipliers
   var rot = 0f
 
   override def settings() = {
@@ -38,17 +38,17 @@ class DiminishingDimensions extends ScalaProcessingApplet with Common3dKeys {
       if (rotX) rotateX(rot)
       if (rotY) rotateY(rot)
       if (rotZ) rotateZ(rot)
-      0 until NumPoints foreach { n =>
-        val c = colors(n)
+      forAllPointIndexes { i =>
+        val c = colors(i)
         stroke(c._1, c._2, c._3)
-        fill(c._1, c._2, c._3)
+        fill  (c._1, c._2, c._3)
         withPushedMatrix {
-          translate(xs(n), ys(n), zs(n))
+          translate(xs(i), ys(i), zs(i))
           box(3)
         }
       }
     }
-    rot += 0.01f
+    rot += 0.005f
 
     val changed = move()
 
@@ -58,33 +58,34 @@ class DiminishingDimensions extends ScalaProcessingApplet with Common3dKeys {
 
   private def move() = {
     phase match {
-      case 0 =>
+      case 0 => explode(Seq((0, xs), (1, ys), (2, zs)))
+      case 1 => coalesceToZero(ys)
+      case 2 => coalesceToZero(zs)
+      case 3 =>
         val changed = coalesceToZero(xs)
         if (!changed) {
           // Restart
           colors = randomColors
           explodeStep = 0
-          explodeMultipliers = (0 until NumPoints).toArray.map { _ =>
-            def a = nextDouble * math.Pi * 2
-            val r = nextDouble * Width
-            val (x, y, z) = sphericalToCartesian(r, a, a)
-            Seq(x, y, z).toArray.map(_ / ExplodeSteps)
-          }
+          explodeMultipliers = calculateExplodeMultipliers
         }
         changed
-      case 1 =>
-        explode(Seq((0, xs), (1, ys), (2, zs)))
-      case 2 =>
-        coalesceToZero(ys)
-      case 3 =>
-        coalesceToZero(zs)
     }
   }
 
-  private def sphericalToCartesian(r: Double, θ: Double, φ: Double) = {
-    val x = r * sin(φ) * cos(θ)
-    val y = r * sin(φ) * sin(θ)
-    val z = r * cos(φ)
+  private def calculateExplodeMultipliers =
+    forAllPointIndexes { _ =>
+      def a = nextDouble * math.Pi * 2
+
+      val r = nextDouble * Width
+      val (x, y, z) = sphericalToCartesian(r, a, a)
+      Seq(x, y, z).toArray.map(_ / ExplodeSteps)
+    }
+
+  private def sphericalToCartesian(radius: Double, θ: Double, φ: Double) = {
+    val x = radius * sin(φ) * cos(θ)
+    val y = radius * sin(φ) * sin(θ)
+    val z = radius * cos(φ)
     (x, y, z)
   }
 
@@ -93,8 +94,10 @@ class DiminishingDimensions extends ScalaProcessingApplet with Common3dKeys {
     super.keyPressed(event)
   }
 
+  private def forAllPointIndexes[A](fn: (Int) => A) = (0 until NumPoints).toArray.map(fn)
+
   private def randomColors = {
-    (0 until NumPoints).toArray.map { _ =>
+    forAllPointIndexes { _ =>
       def rc = 200 + nextInt(56)
       nextInt(3) match {
         case 0 => (rc, rc, 0)
@@ -106,7 +109,7 @@ class DiminishingDimensions extends ScalaProcessingApplet with Common3dKeys {
 
   private def coalesceToZero(coords: Array[Int]) = {
     var changed = false
-    0 until NumPoints foreach { i =>
+    forAllPointIndexes { i =>
       val remaining = math.abs(coords(i))
       val chg = if (coords(i) == 0) 0 else coords(i) / remaining
       if (chg != 0) {
@@ -127,7 +130,6 @@ class DiminishingDimensions extends ScalaProcessingApplet with Common3dKeys {
     }
     explodeStep < ExplodeSteps
   }
-
 }
 
 object DiminishingDimensions {
