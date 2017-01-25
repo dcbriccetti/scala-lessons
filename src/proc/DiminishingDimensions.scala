@@ -1,7 +1,6 @@
 package proc
 
 import scala.util.Random.{nextDouble, nextInt}
-import math.{cos, sin}
 import processing.core.{PApplet, PConstants}
 import processing.event.KeyEvent
 
@@ -81,13 +80,6 @@ class DiminishingDimensions extends ScalaProcessingApplet with Common3dKeys {
       val (x, y, z) = sphericalToCartesian(r, a, a)
       Seq(x, y, z).toArray.map(_ / ExplodeSteps)
     }
-
-  private def sphericalToCartesian(radius: Double, θ: Double, φ: Double) = {
-    val x = radius * sin(φ) * cos(θ)
-    val y = radius * sin(φ) * sin(θ)
-    val z = radius * cos(φ)
-    (x, y, z)
-  }
 
   override def keyPressed(event: KeyEvent): Unit = {
     commonKeyPressed(event)
