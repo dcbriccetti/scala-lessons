@@ -1,50 +1,122 @@
 package spong
 
+import java.awt.event.KeyEvent._
+import scala.util.Random
 import proc.ScalaProcessingApplet
 import processing.core.{PApplet, PConstants}
 
 class SPong extends ScalaProcessingApplet {
+  val TwoPi = math.Pi.toFloat * 2
+  val FieldRadius = 600
+  val BallRadius = FieldRadius / 25
+  val MoveAmt = 0.05f
+  val random = new Random()
+
+  case class Vector3D(var x: Float, var y: Float, var z: Float)
+
+  case class SphericalCoords(
+    var r: Float,
+    var φ: Float,
+    var θ: Float
+  )
+  case class Paddle(
+    position: SphericalCoords,
+    color: (Int, Int, Int)
+  ) {
+    def draw(): Unit = {
+      beginShape()
+      noStroke()
+      fill(color._1, color._2, color._3)
+      1 to 9 foreach { circleIndex =>
+        val φVertex = circleIndex / 40d
+        val pointsAroundCircle = 10 * circleIndex
+        0 to pointsAroundCircle foreach { pointIndex =>
+          val θVertex = pointIndex * (TwoPi / pointsAroundCircle)
+          sphericalVertex(FieldRadius, θVertex, φVertex)
+        }
+      }
+      endShape()
+    }
+  }
+
+  case class Ball(
+    position: Vector3D,
+    velocity: Vector3D
+  ) {
+    def bounce() = {
+      def bounceCoord(coord: Float) = {
+        val randomness = 1f
+        -coord + random.nextFloat * randomness - randomness / 2
+      }
+      velocity.x = bounceCoord(velocity.x)
+      velocity.y = bounceCoord(velocity.y)
+      velocity.z = bounceCoord(velocity.z)
+    }
+
+    def radius = math.sqrt(
+      position.x * position.x + position.y * position.y + position.z * position.z)
+  }
+
+  val playerPaddle = Paddle(SphericalCoords(FieldRadius, 0, 0), (0, 255, 0))
+  val paddles = Seq(
+    Paddle(SphericalCoords(FieldRadius, TwoPi / 8, TwoPi / 8), (255, 0, 0)),
+    playerPaddle
+  )
+  val ball = Ball(Vector3D(0, 0, 0), Vector3D(2, 0.5f, 4f))
+
   override def settings() = {
-    size(1000, 1000, PConstants.P3D)
+    size(2560, 1440, PConstants.P3D)
   }
 
   override def setup() = {
     frameRate(60)
   }
 
-  val twoPi = math.Pi.toFloat * 2
-  val radius = 300
-
   override def draw(): Unit = {
     background(0)
+    noLights()
+
     translate(width / 2, height / 2, 0)
-    lights()
-    rotateY(mouseX.toFloat / width  * twoPi)
-    rotateX(mouseY.toFloat / height * twoPi)
 
-    drawPaddle(0)
-    drawPaddle(twoPi / 2)
-
-    noFill()
-    stroke(90)
-    sphere(radius)
-  }
-
-  private def drawPaddle(pos: Float) = {
-    beginShape()
-    stroke(255)
-    fill(255, 0, 0)
-    0 to 10 foreach { a =>
-      val φ = pos + a / 60d
-      var θ = 0f
-      val pointsAroundCircle = 10 * a + 2
-      1 to pointsAroundCircle + 1 foreach { _ =>
-        sphericalVertex(radius, θ, φ)
-        θ += twoPi / pointsAroundCircle
+    paddles.foreach { paddle =>
+      withPushedMatrix {
+        rotateY(paddle.position.φ)
+        rotateX(paddle.position.θ)
+        paddle.draw()
       }
     }
-    endShape()
-    radius
+
+    if (keyPressed) {
+      val pos = playerPaddle.position
+      keyCode match {
+        case VK_LEFT =>
+          pos.φ -= MoveAmt
+        case VK_RIGHT =>
+          pos.φ += MoveAmt
+        case VK_UP =>
+          pos.θ += MoveAmt
+        case VK_DOWN =>
+          pos.θ -= MoveAmt
+        case _ =>
+      }
+    }
+
+    noFill()
+    stroke(80)
+    sphere(FieldRadius - 5)
+
+    lights()
+    stroke(0, 0, 255)
+    withPushedMatrix {
+      translate(ball.position.x, ball.position.y, ball.position.z)
+      sphere(BallRadius)
+    }
+    ball.position.x += ball.velocity.x
+    ball.position.y += ball.velocity.y
+    ball.position.z += ball.velocity.z
+    if (ball.radius >= FieldRadius) {
+      ball.bounce()
+    }
   }
 }
 
