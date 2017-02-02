@@ -43,7 +43,14 @@ class SPong extends ScalaProcessingApplet {
     position: Vector3D,
     velocity: Vector3D
   ) {
-    def bounce() = {
+    def move(): Unit = {
+      position.x += velocity.x
+      position.y += velocity.y
+      position.z += velocity.z
+    }
+
+    /** Naïvely bounce, with a bit of randomness */
+    def bounce(): Unit = {
       def bounceCoord(coord: Float) = {
         val randomness = 1f
         -coord + random.nextFloat * randomness - randomness / 2
@@ -53,7 +60,7 @@ class SPong extends ScalaProcessingApplet {
       velocity.z = bounceCoord(velocity.z)
     }
 
-    def radius = math.sqrt(
+    def radius: Double = math.sqrt(
       position.x * position.x + position.y * position.y + position.z * position.z)
   }
 
@@ -89,15 +96,11 @@ class SPong extends ScalaProcessingApplet {
     if (keyPressed) {
       val pos = playerPaddle.position
       keyCode match {
-        case VK_LEFT =>
-          pos.φ -= MoveAmt
-        case VK_RIGHT =>
-          pos.φ += MoveAmt
-        case VK_UP =>
-          pos.θ += MoveAmt
-        case VK_DOWN =>
-          pos.θ -= MoveAmt
-        case _ =>
+        case VK_LEFT  => pos.φ -= MoveAmt
+        case VK_RIGHT => pos.φ += MoveAmt
+        case VK_UP    => pos.θ += MoveAmt
+        case VK_DOWN  => pos.θ -= MoveAmt
+        case _        =>
       }
     }
 
@@ -105,15 +108,12 @@ class SPong extends ScalaProcessingApplet {
     stroke(80)
     sphere(FieldRadius - 5)
 
-    lights()
     stroke(0, 0, 255)
     withPushedMatrix {
       translate(ball.position.x, ball.position.y, ball.position.z)
       sphere(BallRadius)
     }
-    ball.position.x += ball.velocity.x
-    ball.position.y += ball.velocity.y
-    ball.position.z += ball.velocity.z
+    ball.move()
     if (ball.radius >= FieldRadius) {
       ball.bounce()
     }
