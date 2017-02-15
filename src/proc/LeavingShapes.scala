@@ -86,5 +86,5 @@ class LeavingShapes extends ScalaProcessingApplet {
 
 object LeavingShapes {
   def main(args: Array[String]): Unit =
-    PApplet.main("proc.LeavingCubes")
+    PApplet.main("proc.LeavingShapes")
 }
