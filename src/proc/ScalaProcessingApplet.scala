@@ -14,6 +14,12 @@ abstract class ScalaProcessingApplet extends PApplet {
     popMatrix()
   }
 
+  /** Runs the given function every “frames” frames */
+  protected def every(frames: Int)(fn: => Unit): Unit = {
+    if (frameCount % frames == 0)
+      fn
+  }
+
   def sphericalToCartesian(radius: Double, θ: Double, φ: Double): (Float, Float, Float) = {
     val x = radius * sin(φ) * cos(θ)
     val y = radius * sin(φ) * sin(θ)
