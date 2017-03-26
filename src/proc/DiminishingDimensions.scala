@@ -117,7 +117,7 @@ class DiminishingDimensions extends ScalaProcessingApplet with Common3dKeys {
     0 until NumPoints foreach { i =>
       axes.foreach {
         case (axisIndex, coords) =>
-          coords(i) = math.round(explodeStep * explodeMultipliers(i)(axisIndex)).toInt
+          coords(i) = math.round(explodeStep * explodeMultipliers(i)(axisIndex))
       }
     }
     explodeStep < ExplodeSteps
