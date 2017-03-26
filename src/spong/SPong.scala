@@ -12,58 +12,6 @@ class SPong extends ScalaProcessingApplet {
   val MoveAmt = 0.05f
   val random = new Random()
 
-  case class Vector3D(var x: Float, var y: Float, var z: Float)
-
-  case class SphericalCoords(
-    var r: Float,
-    var φ: Float,
-    var θ: Float
-  )
-  case class Paddle(
-    position: SphericalCoords,
-    color: (Int, Int, Int)
-  ) {
-    def draw(): Unit = {
-      beginShape()
-      noStroke()
-      fill(color._1, color._2, color._3)
-      1 to 9 foreach { circleIndex =>
-        val φVertex = circleIndex / 40d
-        val pointsAroundCircle = 10 * circleIndex
-        0 to pointsAroundCircle foreach { pointIndex =>
-          val θVertex = pointIndex * (TwoPi / pointsAroundCircle)
-          sphericalVertex(FieldRadius, θVertex, φVertex)
-        }
-      }
-      endShape()
-    }
-  }
-
-  case class Ball(
-    position: Vector3D,
-    velocity: Vector3D
-  ) {
-    def move(): Unit = {
-      position.x += velocity.x
-      position.y += velocity.y
-      position.z += velocity.z
-    }
-
-    /** Naïvely bounce, with a bit of randomness */
-    def bounce(): Unit = {
-      def bounceCoord(coord: Float) = {
-        val randomness = 1f
-        -coord + random.nextFloat * randomness - randomness / 2
-      }
-      velocity.x = bounceCoord(velocity.x)
-      velocity.y = bounceCoord(velocity.y)
-      velocity.z = bounceCoord(velocity.z)
-    }
-
-    def radius: Double = math.sqrt(
-      position.x * position.x + position.y * position.y + position.z * position.z)
-  }
-
   val playerPaddle = Paddle(SphericalCoords(FieldRadius, 0, 0), (0, 255, 0))
   val paddles = Seq(
     Paddle(SphericalCoords(FieldRadius, TwoPi / 8, TwoPi / 8), (255, 0, 0)),
@@ -89,7 +37,7 @@ class SPong extends ScalaProcessingApplet {
       withPushedMatrix {
         rotateY(paddle.position.φ)
         rotateX(paddle.position.θ)
-        paddle.draw()
+        paddle.draw(this)
       }
     }
 
@@ -108,7 +56,7 @@ class SPong extends ScalaProcessingApplet {
     stroke(80)
     sphere(FieldRadius - 5)
 
-    stroke(0, 0, 255)
+    stroke(255, 255, 0)
     withPushedMatrix {
       translate(ball.position.x, ball.position.y, ball.position.z)
       sphere(BallRadius)
@@ -122,4 +70,59 @@ class SPong extends ScalaProcessingApplet {
 
 object SPong {
   def main(args: Array[String]) = PApplet.main("spong.SPong")
+}
+
+case class Vector3D(var x: Float, var y: Float, var z: Float)
+
+case class SphericalCoords(
+  var r: Float,
+  var φ: Float,
+  var θ: Float
+)
+
+case class Paddle(
+  position: SphericalCoords,
+  color: (Int, Int, Int)
+) {
+  def draw(pa: ScalaProcessingApplet): Unit = {
+    pa.beginShape()
+    pa.noStroke()
+    pa.fill(color._1, color._2, color._3)
+    1 to 9 foreach { circleIndex =>
+      val φVertex = circleIndex / 40d
+      val pointsAroundCircle = 10 * circleIndex
+      0 to pointsAroundCircle foreach { pointIndex =>
+        val θVertex = pointIndex * (math.Pi.toFloat * 2 / pointsAroundCircle)
+        pa.sphericalVertex(position.r, θVertex, φVertex)
+      }
+    }
+    pa.endShape()
+  }
+}
+
+case class Ball(
+  position: Vector3D,
+  velocity: Vector3D
+) {
+  private val random = new Random()
+
+  def move(): Unit = {
+    position.x += velocity.x
+    position.y += velocity.y
+    position.z += velocity.z
+  }
+
+  /** Naïvely bounce, with a bit of randomness */
+  def bounce(): Unit = {
+    def bounceCoord(coord: Float) = {
+      val randomness = 1f
+      -coord + random.nextFloat * randomness - randomness / 2
+    }
+    velocity.x = bounceCoord(velocity.x)
+    velocity.y = bounceCoord(velocity.y)
+    velocity.z = bounceCoord(velocity.z)
+  }
+
+  def radius: Double = math.sqrt(
+    position.x * position.x + position.y * position.y + position.z * position.z)
 }
