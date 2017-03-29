@@ -41,7 +41,7 @@ object Adventure {
     val treasureRoom= Place("a room full of treasure", prep = "in", goal = true)
 
     val transitionsByPlace = {
-      implicit def placeToTransition(place: Place) = Transition(place)
+      implicit def placeToTransition(place: Place): Transition = Transition(place)
       Map[Place, Seq[Transition]](
         livingRoom  -> Seq(road, closet),
         road        -> Seq(livingRoom, Transition(bus, mustHave = Seq(BusPass))),
@@ -54,7 +54,7 @@ object Adventure {
     }
 
     var availInventoryByPlace: Map[Place, Seq[InventoryItem]] = Map(
-      closet  -> Seq(new Money(100), BusPass),
+      closet  -> Seq(Money(100), BusPass),
       library -> Seq(CodeBreakingBook)
     )
 
@@ -62,7 +62,7 @@ object Adventure {
 
     while (keepRunning) {
       println(s"\nYou are ${gs.place.prep} ${gs.place.title}.")
-      if (gs.inventory.size > 0) {
+      if (gs.inventory.nonEmpty) {
         println(s"You are carrying: ${gs.inventory.map(_.name).mkString(", ")}.")
       }
       val displayMoney = if (gs.money > 0) s"$$${gs.money} cash" else "no money"
