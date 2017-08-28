@@ -2,7 +2,7 @@ package proc
 
 import java.text.NumberFormat
 import scala.util.Random.nextInt
-import processing.core.PApplet
+import processing.core.{PApplet, PFont}
 import processing.core.PConstants.CENTER
 
 class DiceHistogram extends PApplet {
@@ -16,8 +16,8 @@ class DiceHistogram extends PApplet {
   val counts = new Array[Int](numBars)
   var numRolls = 0
   var displayedFrameRate = 0
-  val font1 = createFont("Helvetica", 14)
-  val font2 = createFont("Helvetica", 10)
+  var font1: PFont = _
+  var font2: PFont = _
   val nf = NumberFormat.getInstance
   nf.setMaximumFractionDigits(0)
   val combinations = generateCombinations(numDice)
@@ -28,6 +28,8 @@ class DiceHistogram extends PApplet {
   }
 
   override def setup() {
+    font1 = createFont("Helvetica", 14)
+    font2 = createFont("Helvetica", 10)
     textAlign(CENTER, CENTER)
     smooth()
     noStroke()
