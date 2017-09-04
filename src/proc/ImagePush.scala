@@ -15,6 +15,7 @@ class ImagePush extends ScalaProcessingApplet {
 
   override def setup(): Unit = {
     img = loadImage("proc/ImagePush.jpg")
+    img.loadPixels()
   }
 
   override def draw() = {
@@ -26,8 +27,8 @@ class ImagePush extends ScalaProcessingApplet {
       rotateY(PApplet.map(mouseX, 0, height, -HALF_PI, HALF_PI))
       translate(-img.width / 2, -img.height / 2)
 
-      for (x <- 0 to img.width; y <- 0 to img.height) {
-        val rgb = img.get(x, y)
+      for (x <- 0 until img.width; y <- 0 until img.height) {
+        val rgb = img.pixels(x + y * img.width)
         stroke(rgb >> 16 & 255, rgb >> 8 & 255, rgb & 255)
         point(x, y, brightness(rgb))
       }
