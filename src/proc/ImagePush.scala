@@ -1,8 +1,9 @@
 package proc
 
 import processing.core.{PApplet, PConstants, PImage}
-import PConstants.HALF_PI
 import processing.event.KeyEvent
+import PApplet.{map => pmap}
+import PConstants.HALF_PI
 
 /** Displays a photo, pushing individual pixels on the z axis according to their intensity */
 class ImagePush extends ScalaProcessingApplet {
@@ -23,8 +24,8 @@ class ImagePush extends ScalaProcessingApplet {
     translate(width / 2, height / 2, -400)
 
     if (pushing) {
-      rotateX(PApplet.map(mouseY, 0, height, HALF_PI, -HALF_PI))
-      rotateY(PApplet.map(mouseX, 0, height, -HALF_PI, HALF_PI))
+      rotateX(pmap(mouseY, 0, height,  HALF_PI, -HALF_PI))
+      rotateY(pmap(mouseX, 0, height, -HALF_PI,  HALF_PI))
       translate(-img.width / 2, -img.height / 2)
 
       for (x <- 0 until img.width; y <- 0 until img.height) {
