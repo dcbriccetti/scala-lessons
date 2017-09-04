@@ -30,8 +30,12 @@ class ImagePush extends ScalaProcessingApplet {
 
       for (x <- 0 until img.width; y <- 0 until img.height) {
         val rgb = img.pixels(x + y * img.width)
-        stroke(rgb >> 16 & 255, rgb >> 8 & 255, rgb & 255)
-        point(x, y, brightness(rgb))
+        val red   = rgb >> 16 & 255
+        val green = rgb >> 8  & 255
+        val blue  = rgb       & 255
+        stroke(red, green, blue)
+        val brightness = (red + green + blue) / 3
+        point(x, y, brightness)
       }
     } else image(img, -img.width / 2, -img.height / 2)
   }
