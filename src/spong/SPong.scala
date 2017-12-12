@@ -10,12 +10,11 @@ class SPong extends ScalaProcessingApplet {
   val BallRadius = FieldRadius / 25
   val MoveAmt = 0.05f
   var fillPaddles = true
+  var arenaSphereDetail = 20
 
-  val playerPaddle = Paddle(SphericalCoords(FieldRadius, 0, 0), (0, 255, 0))
-  val paddles = Seq(
-    Paddle(SphericalCoords(FieldRadius, 0.8f, 0.3f), (255, 0, 0)),
-    playerPaddle
-  )
+  val playerPaddle = Paddle(SphericalCoords(FieldRadius, 0   ,    0), (0, 255, 0))
+  val npcPaddle    = Paddle(SphericalCoords(FieldRadius, 0.8f, 0.3f), (255, 0, 0))
+  val paddles = Seq(npcPaddle, playerPaddle)
   val ball = Ball(new PVector(0, 0, 0), new PVector(2, 0.5f, 4f))
 
   override def settings() = {
@@ -36,10 +35,17 @@ class SPong extends ScalaProcessingApplet {
 
   override def draw(): Unit = {
     background(0)
-    noLights()
-
     translate(width / 2, height / 2, 400)
 
+    drawPaddles()
+    drawArenaSphere()
+    drawBall()
+
+    movePlayerPaddle()
+    moveBall()
+  }
+
+  private def drawPaddles() = {
     paddles.foreach { paddle =>
       withPushedMatrix {
         rotateY(paddle.position.φ)
@@ -47,27 +53,42 @@ class SPong extends ScalaProcessingApplet {
         paddle.draw(this, fillPaddles)
       }
     }
+  }
 
-    if (keyPressed) {
-      val pos = playerPaddle.position
-      keyCode match {
-        case VK_LEFT  => pos.φ -= MoveAmt
-        case VK_RIGHT => pos.φ += MoveAmt
-        case VK_UP    => pos.θ += MoveAmt
-        case VK_DOWN  => pos.θ -= MoveAmt
-        case _        =>
-      }
-    }
-
+  private def drawArenaSphere() = {
     noFill()
     stroke(80)
+    sphereDetail(arenaSphereDetail)
     sphere(FieldRadius - 5)
+  }
 
+  private def drawBall() = {
     stroke(255, 255, 0)
     withPushedMatrix {
       translate(ball.position.x, ball.position.y, ball.position.z)
       sphere(BallRadius)
     }
+  }
+
+  private def movePlayerPaddle() = {
+    if (keyPressed) {
+      val pos = playerPaddle.position
+      keyCode match {
+        case VK_LEFT => pos.φ -= MoveAmt
+        case VK_RIGHT => pos.φ += MoveAmt
+        case VK_UP => pos.θ += MoveAmt
+        case VK_DOWN => pos.θ -= MoveAmt
+        case _ =>
+          key match { // Using key instead of keyCode to support layouts like Dvorak
+            case 'D'  => arenaSphereDetail += 1
+            case 'd'  => if (arenaSphereDetail > 3) arenaSphereDetail -= 1
+            case _    =>
+          }
+      }
+    }
+  }
+
+  private def moveBall() = {
     ball.move()
     if (ball.position.mag() >= FieldRadius) {
       ball.bounce()
