@@ -2,11 +2,13 @@ package geo
 
 import java.io._
 import java.net.{URL, URLEncoder}
-import scala.xml.{NodeSeq, XML}
 
+import proc.ScalaProcessingApplet
+
+import scala.xml.{NodeSeq, XML}
 import processing.core.{PApplet, PConstants}
 
-class Geo extends PApplet {
+class Geo extends ScalaProcessingApplet {
   val apiKey = Secrets.apiKey  // Get an API key from https://developers.google.com/places/
   val area = "94549"
   val startTime = System.currentTimeMillis
@@ -67,18 +69,16 @@ class Geo extends PApplet {
     box(ScreenWidth, ScreenHeight, ElevScreenFraction)
 
     places foreach {place =>
-      pushMatrix()
+      withPushedMatrix {
+        translate(longTransformer.toScreen(place.long),
+          latTransformer.toScreen(place.lat), elevTransformer.toScreen(place.elevation))
+        stroke(0, 255, 0)
+        sphere(5)
 
-      translate(longTransformer.toScreen(place.long),
-        latTransformer.toScreen(place.lat), elevTransformer.toScreen(place.elevation))
-      stroke(0, 255, 0)
-      sphere(5)
-
-      rotateZ(-globalZRot)
-      rotateX(-globalXRot)
-      text(place.name, 7, 3)
-
-      popMatrix()
+        rotateZ(-globalZRot)
+        rotateX(-globalXRot)
+        text(place.name, 7, 3)
+      }
     }
   }
 
