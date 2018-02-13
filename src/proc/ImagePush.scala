@@ -5,7 +5,7 @@ import processing.event.KeyEvent
 import PApplet.{map => pmap}
 import PConstants.HALF_PI
 
-/** Displays a photo, pushing individual pixels on the z axis according to their intensity */
+/** Displays a photo, pushing individual pixels on the z axis according to some function of their RGB values */
 class ImagePush extends ScalaProcessingApplet {
   var img: PImage = _
   var pushing = false
@@ -15,13 +15,13 @@ class ImagePush extends ScalaProcessingApplet {
   }
 
   override def setup(): Unit = {
-    img = loadImage("proc/ImagePush.jpg")
+    img = loadImage("proc/Ishihara-Test.svg.png") // From https://commons.wikimedia.org/wiki/File:Ishihara-Test.svg
     img.loadPixels()
   }
 
   override def draw() = {
     background(0)
-    translate(width / 2, height / 2, -400)
+    translate(width / 2, height / 2, 0)
 
     if (pushing) {
       rotateX(pmap(mouseY, 0, height,  HALF_PI, -HALF_PI))
@@ -34,8 +34,8 @@ class ImagePush extends ScalaProcessingApplet {
         val green = rgb >>  8 & 255
         val blue  = rgb       & 255
         stroke(red, green, blue)
-        val brightness = (red + green + blue) / 3
-        point(x, y, brightness)
+        val closeness = green
+        point(x, y, closeness)
       }
     } else image(img, -img.width / 2, -img.height / 2)
   }
