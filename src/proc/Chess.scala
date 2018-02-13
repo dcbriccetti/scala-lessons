@@ -16,12 +16,13 @@ class Chess extends ScalaProcessingApplet {
     translate(width / 2, height / 2, -100)
     rotateX(pmap(mouseY, 0, height, PI / 2, 0))
     rotateZ(pmap(mouseX, 0, height, PI / 16, -PI / 16))
-    val range = 0 to 7
+    val range = -4 to 3
+
     for (x <- range; y <- range) {
-      val blackOrWhite = if ((x + y) % 2 == 0) 255 else 32
-      fill(blackOrWhite)
+      val squareColor = if ((x + y) % 2 == 0) 255 else 32
+      fill(squareColor)
       withPushedMatrix {
-        translate((x - 4) * edge + halfEdge, (y - 4) * edge + halfEdge)
+        translate(x * edge + halfEdge, y * edge + halfEdge)
         noStroke()
         box(edge, edge, 4)
       }
