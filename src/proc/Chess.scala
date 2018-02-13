@@ -1,6 +1,7 @@
 package proc
 
 import processing.core.{PApplet, PConstants}
+import PApplet.{map => pmap}
 import PConstants.PI
 
 class Chess extends ScalaProcessingApplet {
@@ -13,7 +14,8 @@ class Chess extends ScalaProcessingApplet {
     val edge = 40
     val halfEdge = edge / 2
     translate(width / 2, height / 2, -100)
-    rotateX(PI / 4)
+    rotateX(pmap(mouseY, 0, height, PI / 2, 0))
+    rotateZ(pmap(mouseX, 0, height, PI / 16, -PI / 16))
     val range = 0 to 7
     for (x <- range; y <- range) {
       val blackOrWhite = if ((x + y) % 2 == 0) 255 else 32
