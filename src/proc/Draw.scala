@@ -2,6 +2,8 @@ package proc
 import processing.core.{PApplet, PConstants}
 
 class Draw extends PApplet {
+  override def settings(): Unit = fullScreen(PConstants.P3D)
+
   override def draw() = {
     colorMode(PConstants.HSB)
     strokeWeight(4)
