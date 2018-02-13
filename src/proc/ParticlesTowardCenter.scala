@@ -18,11 +18,12 @@ class ParticlesTowardCenter extends ScalaProcessingApplet {
   override def draw() = {
     background(0)
     translate(width / 2, height / 2)
+    // X controls speed towards center. Y controls density.
     if (frameCount % 5 == 0) {
       val stepsToCenter = pmap(mouseX, 0, width - 1, 1000, 10).toInt
       particles :+= Particle(nextParticleAngle, stepsToCenter)
     }
-    val angleChange = pmap(mouseY, 0, height, 0.2F, 0.02F)
+    val angleChange = pmap(mouseY, 0, height, 0.02F, 0.2F)
     nextParticleAngle = (nextParticleAngle + angleChange) % TWO_PI
     for (p <- particles) {
       p.draw()
