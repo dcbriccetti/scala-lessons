@@ -9,9 +9,7 @@ import PConstants.{PI, TRIANGLE_STRIP}
   *   https://www.youtube.com/watch?v=IKB1hWWedMk
   */
 class Terrain extends ScalaProcessingApplet {
-  override def settings(): Unit = {
-    size(1920, 1060, PConstants.P3D)
-  }
+  override def settings(): Unit = fullScreen(PConstants.P3D)
 
   override def draw() = {
     val spacing = 20

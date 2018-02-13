@@ -2,7 +2,7 @@ package proc
 
 /** Randomly provides a variety of color part gradients (values 0 to 1) */
 class Gradient {
-  private var rgbTypes = randomColorTypes
+  private val rgbTypes = randomColorTypes
   private val constantVal = math.random.toFloat
 
   /** Returns red, green, and blue color values (0 to 1), given the proportion through the gradient (0 to 1) */

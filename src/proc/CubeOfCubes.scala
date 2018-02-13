@@ -4,11 +4,9 @@ import processing.core.{PApplet, PConstants}
 
 class CubeOfCubes extends ScalaProcessingApplet {
   private val BOX_SPACING = 50
-  private lazy val maxOffset = height / 2 - 200
+  private lazy val maxOffset = height / 2 - 300
 
-  override def settings(): Unit = {
-    size(2560, 1420, PConstants.P3D)
-  }
+  override def settings(): Unit = fullScreen(PConstants.P3D)
 
   override def draw() = {
     background(0)

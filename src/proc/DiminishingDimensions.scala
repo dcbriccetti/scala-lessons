@@ -2,12 +2,13 @@ package proc
 
 import scala.util.Random.{nextDouble, nextInt}
 import processing.core.{PApplet, PConstants}
+import PConstants.HSB
 import processing.event.KeyEvent
 
 class DiminishingDimensions extends ScalaProcessingApplet with Common3dKeys {
   val Height = 600
   val Width = (Height * 1.8).toInt
-  val NumPoints = 5000
+  val NumPoints = 3000
   var colors = randomColors
   var phase = 0
 
@@ -21,12 +22,11 @@ class DiminishingDimensions extends ScalaProcessingApplet with Common3dKeys {
   var explodeMultipliers = calculateExplodeMultipliers
   var rot = 0f
 
-  override def settings() = {
-    size(1920, 1080, PConstants.P3D)
-  }
+  override def settings(): Unit = fullScreen(PConstants.P3D)
 
   override def setup() = {
     frameRate(60)
+    colorMode(HSB, 100)
   }
 
   override def draw() = if (! suspend) {
@@ -89,14 +89,7 @@ class DiminishingDimensions extends ScalaProcessingApplet with Common3dKeys {
   private def forAllPointIndexes[A](fn: (Int) => A) = (0 until NumPoints).toArray.map(fn)
 
   private def randomColors = {
-    forAllPointIndexes { _ =>
-      def rc = 200 + nextInt(56)
-      nextInt(3) match {
-        case 0 => (rc, rc, 0)
-        case 1 => (0, 0, rc)
-        case 2 => (rc, rc, rc)
-      }
-    }
+    forAllPointIndexes { _ => (nextInt(101), 100, 80 + nextInt(21)) }
   }
 
   private def coalesceToZero(coords: Array[Int]) = {

@@ -14,9 +14,9 @@ class MultiColoredLines extends PApplet {
   override def draw() = {
     def cv = nextInt(256)
     stroke(cv, cv, cv)
-    0 until width by 100 foreach(x => {
+    0 until width by 100 foreach {x =>
       line(x, 0, mouseX, mouseY)
-    })
+    }
   }
 
   override def keyPressed(e: KeyEvent) = {
